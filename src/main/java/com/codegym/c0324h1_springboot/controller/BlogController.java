@@ -15,12 +15,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/blog")
 public class BlogController {
     @Value("${upload.path}")
     private String fileUpload;
+
     @Autowired
     private IBlogService blogService;
 
@@ -40,85 +42,77 @@ public class BlogController {
 
     @GetMapping("/create")
     public String showFormCreate(Model model) {
-        model.addAttribute("blogFromCreateDto", new BlogFormCreateDTO());
+        model.addAttribute("blogFormCreateDto", new BlogFormCreateDTO());
         return "create";
     }
 
     @PostMapping("/create")
-    public String save(@ModelAttribute BlogFormCreateDTO blogFromCreateDto,
+    public String save(@ModelAttribute BlogFormCreateDTO blogFormCreateDto,
                        RedirectAttributes redirect) {
-        MultipartFile multipartFile = blogFromCreateDto.getAvatar();
+        MultipartFile multipartFile = blogFormCreateDto.getAvatar();
         String fileName = multipartFile.getOriginalFilename();
         try {
-            System.out.println( fileUpload + fileName);
-            FileCopyUtils.copy(blogFromCreateDto.getAvatar().getBytes(), new File(fileUpload + fileName));
-
+            System.out.println(fileUpload + fileName);
+            FileCopyUtils.copy(blogFormCreateDto.getAvatar().getBytes(), new File(fileUpload + fileName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Blog blog = new Blog(blogFromCreateDto.getId(), blogFromCreateDto.getTitle(), blogFromCreateDto.getContent(), blogFromCreateDto.getAuthor(), fileName);
-        redirect.addFlashAttribute("noti", "Thêm mới thành công!");
+        Blog blog = new Blog(blogFormCreateDto.getId(), blogFormCreateDto.getTitle(), blogFormCreateDto.getContent(), blogFormCreateDto.getAuthor(), fileName);
         blogService.save(blog);
+        redirect.addFlashAttribute("noti", "Thêm mới thành công!");
         return "redirect:/blog";
     }
 
     @GetMapping("{id}/content")
-    public String showContent(Model model,
-                              @PathVariable Long id) {
+    public String showContent(Model model, @PathVariable Long id) {
         Blog blog = blogService.findById(id);
-        if(blog.equals(null)) {
+        if (blog == null) {
             return "redirect:/blog";
         }
-        model.addAttribute("blog",blog);
+        model.addAttribute("blog", blog);
         return "content";
     }
 
     @GetMapping("{id}/delete")
-    public String showFormDelete(Model model,
-                                 @PathVariable Long id) {
+    public String showFormDelete(Model model, @PathVariable Long id) {
         Blog blog = blogService.findById(id);
-        if(blog.equals(null)) {
+        if (blog == null) {
             return "redirect:/blog/list";
         }
-
-        model.addAttribute("blog",blog);
+        model.addAttribute("blog", blog);
         return "delete";
     }
 
     @PostMapping("/delete")
-    public String delete(@ModelAttribute Blog blog,
-                         RedirectAttributes redirect) {
+    public String delete(@ModelAttribute Blog blog, RedirectAttributes redirect) {
         blogService.delete(blog.getId());
         redirect.addFlashAttribute("noti", "Xóa thành công!");
         return "redirect:/blog/list";
     }
 
     @GetMapping("{id}/update")
-    public String showFormUpdate(Model model,
-                                 @PathVariable Long id) {
+    public String showFormUpdate(Model model, @PathVariable Long id) {
         Blog blog = blogService.findById(id);
-        if(blog.equals(null)) {
+        if (blog == null) {
             return "redirect:/blog/list";
         }
-        model.addAttribute("blog",blog);
+        model.addAttribute("blog", blog);
         return "update";
     }
 
     @PostMapping("/update")
-    public String update(@ModelAttribute BlogFormUpdateDTO blogFormUpdateDto,
-                         RedirectAttributes redirect) {
+    public String update(@ModelAttribute BlogFormUpdateDTO blogFormUpdateDto, RedirectAttributes redirect) {
         MultipartFile multipartFile = blogFormUpdateDto.getAvatar();
         String fileName = multipartFile.getOriginalFilename();
         try {
-            System.out.println( fileUpload + fileName);
+            System.out.println(fileUpload + fileName);
             FileCopyUtils.copy(blogFormUpdateDto.getAvatar().getBytes(), new File(fileUpload + fileName));
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         Blog blog = new Blog(blogFormUpdateDto.getId(), blogFormUpdateDto.getTitle(), blogFormUpdateDto.getContent(), blogFormUpdateDto.getAuthor(), fileName);
-        redirect.addFlashAttribute("noti", "Cập nhật thành công!");
         blogService.save(blog);
+        redirect.addFlashAttribute("noti", "Cập nhật thành công!");
         return "redirect:/blog/list";
     }
 }

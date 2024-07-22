@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BlogService implements IBlogService{
-
+public class BlogService implements IBlogService {
     @Autowired
     private IBlogRepo blogRepo;
 
@@ -32,7 +31,7 @@ public class BlogService implements IBlogService{
     }
 
     @Override
-    public void update(Long id) {
-
+    public void update(Blog blog) {
+        blogRepo.save(blog);
     }
 }

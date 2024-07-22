@@ -80,6 +80,7 @@ public class BlogController {
         if(blog.equals(null)) {
             return "redirect:/blog/list";
         }
+
         model.addAttribute("blog",blog);
         return "delete";
     }

@@ -2,8 +2,13 @@ package com.codegym.c0324h1_springboot.service;
 
 import com.codegym.c0324h1_springboot.model.Blog;
 import com.codegym.c0324h1_springboot.repository.IBlogRepo;
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import static jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.title;
 
 @Service
 public class BlogService implements IBlogService {
@@ -11,8 +16,8 @@ public class BlogService implements IBlogService {
     private IBlogRepo blogRepo;
 
     @Override
-    public Iterable<Blog> findAll() {
-        return blogRepo.findAll();
+    public Page<Blog> findAll() {
+        return (Page<Blog>) blogRepo.findAll();
     }
 
     @Override
@@ -33,5 +38,10 @@ public class BlogService implements IBlogService {
     @Override
     public void update(Blog blog) {
         blogRepo.save(blog);
+    }
+
+    @Override
+    public Page<Blog> findAllTitle(HtmlStyle htmlStyle, PageRequest of) {
+        return blogRepo.findAllTitle(title);
     }
 }

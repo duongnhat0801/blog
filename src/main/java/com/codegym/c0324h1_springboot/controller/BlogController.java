@@ -6,6 +6,9 @@ import com.codegym.c0324h1_springboot.model.Blog;
 import com.codegym.c0324h1_springboot.service.IBlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -16,6 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+
+import static jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.title;
 
 @Controller
 @RequestMapping("/blog")
@@ -34,8 +39,10 @@ public class BlogController {
     }
 
     @GetMapping("/list")
-    public String showList(Model model) {
-        Iterable<Blog> blogList = blogService.findAll();
+    public String showList(Model model,
+                               @RequestParam(value = "page", defaultValue = "0")int page) {
+        Sort sort = Sort.by("title").descending();
+        Page<Blog> blogList = blogService.findAllTitle(title, PageRequest.of(page, 20, sort));
         model.addAttribute("blogList", blogList);
         return "list";
     }
